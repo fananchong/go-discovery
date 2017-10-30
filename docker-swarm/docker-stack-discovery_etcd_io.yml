@@ -1,0 +1,41 @@
+version: "3"
+services:
+
+  discovery_etcd_io:
+    image: quay.io/coreos/discovery.etcd.io
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    environment:
+      DISC_ETCD: "http://db:2379"
+      DISC_HOST: "http://discovery_etcd_io"
+    ports:
+      - "80:8087"
+    networks:
+      - net
+      
+  db:
+    image: quay.io/coreos/etcd
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    ports:
+      - "2379:2379"
+      - "2380:2380"
+    volumes:
+      - data:/etcd-data
+    networks:
+      - net
+    command: /usr/local/bin/etcd --data-dir /etcd-data --name node1 --initial-advertise-peer-urls http://db:2380 --listen-peer-urls http://0.0.0.0:2380 --advertise-client-urls http://db:2379 --listen-client-urls http://0.0.0.0:2379 --initial-cluster "node1=http://db:2380"
+    
+networks:
+  net:
+
+volumes:
+  data:
