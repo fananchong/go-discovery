@@ -11,7 +11,7 @@ services:
         condition: on-failure
     environment:
       DISC_ETCD: "http://db:2379"
-      DISC_HOST: "http://discovery_etcd_io"
+      DISC_HOST: "http://0.0.0.0"
     ports:
       - "80:8087"
     networks:
