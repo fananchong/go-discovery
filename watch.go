@@ -30,6 +30,7 @@ func (this *Watch) Open(derived IWatch, watchNodeTypes []int) {
 }
 
 func (this *Watch) watch(nodeType int) {
+	glog.Infoln("start watch node, node type =", nodeType)
 	defer func() {
 		if err := recover(); err != nil {
 			glog.Errorln("[异常] ", err, "\n", string(debug.Stack()))

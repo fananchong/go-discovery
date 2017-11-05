@@ -17,7 +17,7 @@ type Node struct {
 	client *clientv3.Client
 }
 
-func (this *Node) Open(hosts []string, nodeType int, watchNodeTypes []int, putInterval time.Duration) {
+func (this *Node) Open(hosts []string, nodeType int, watchNodeTypes []int, putInterval int64) {
 	clientv3.SetLogger(NewLogger())
 	cli, err := clientv3.New(clientv3.Config{
 		Endpoints:   hosts,
