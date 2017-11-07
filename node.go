@@ -5,10 +5,10 @@ import (
 	"time"
 
 	"github.com/coreos/etcd/clientv3"
-	"github.com/golang/glog"
 )
 
 type INode interface {
+	Id() string
 	GetClient() *clientv3.Client
 	Close()
 }
@@ -24,6 +24,11 @@ type Node struct {
 	mutex          sync.Mutex
 }
 
+func (this *Node) Init(inst interface{}) {
+	this.Watch.Derived = inst.(IWatch)
+	this.Put.Derived = inst.(IPut)
+}
+
 func (this *Node) Open(hosts []string, nodeType int, watchNodeTypes []int, putInterval int64) {
 	this.hosts = hosts
 	this.nodeType = nodeType
@@ -35,15 +40,15 @@ func (this *Node) Open(hosts []string, nodeType int, watchNodeTypes []int, putIn
 	})
 	this.client = cli
 	if err != nil {
-		glog.Errorln(err)
+		clientv3.GetLogger().Fatalln(err)
 		go this.reopen()
 		return
 	}
 	if len(watchNodeTypes) != 0 {
-		this.Watch.Open(this, watchNodeTypes)
+		this.Watch.Open(watchNodeTypes)
 	}
 	if nodeType != 0 {
-		this.Put.Open(this, nodeType, putInterval)
+		this.Put.Open(nodeType, putInterval)
 	}
 }
 
@@ -63,7 +68,7 @@ func (this *Node) Close() {
 }
 
 func (this *Node) reopen() {
-	glog.Infoln("reopen after 5 sec.")
+	clientv3.GetLogger().Println("reopen after 5 sec.")
 	t := time.NewTimer(5 * time.Second)
 	select {
 	case <-t.C:
@@ -80,11 +85,11 @@ func (this *Node) GetClient() *clientv3.Client {
 }
 
 // 子类可以根据需要重载下面的方法
-func (this *Node) OnNodeUpdate(nodeType int, id string, data string) {
+func (this *Node) OnNodeUpdate(nodeType int, id string, data []byte) {
 
 }
 
-func (this *Node) OnNodeJoin(nodeType int, id string, data string) {
+func (this *Node) OnNodeJoin(nodeType int, id string, data []byte) {
 
 }
 

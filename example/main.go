@@ -14,19 +14,21 @@ type MyNode struct {
 }
 
 func NewMyNode() *MyNode {
-	return &MyNode{}
+	this := &MyNode{}
+	this.Node.Init(this)
+	return this
 }
 
-func (this *MyNode) OnNodeUpdate(nodeType int, id string, data string) {
-
+func (this *MyNode) OnNodeUpdate(nodeType int, id string, data []byte) {
+	xlog.Infoln("OnNodeUpdate: nodeType =", nodeType, "id =", id, "data =", data)
 }
 
-func (this *MyNode) OnNodeJoin(nodeType int, id string, data string) {
-
+func (this *MyNode) OnNodeJoin(nodeType int, id string, data []byte) {
+	xlog.Infoln("OnNodeJoin: nodeType =", nodeType, "id =", id, "data =", data)
 }
 
 func (this *MyNode) OnNodeLeave(nodeType int, id string) {
-
+	xlog.Infoln("OnNodeLeave: nodeType =", nodeType, "id =", id)
 }
 
 func (this *MyNode) GetPutData() string {
@@ -42,7 +44,7 @@ func main() {
 	watchNodeTypes := ""
 	flag.StringVar(&watchNodeTypes, "watchNodeTypes", "1,2,3,4", "watch node type")
 	putInterval := int64(0)
-	flag.Int64Var(&putInterval, "putInterval", 5000, "put interval")
+	flag.Int64Var(&putInterval, "putInterval", 1, "put interval")
 
 	flag.Parse()
 

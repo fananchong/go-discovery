@@ -1,7 +1,7 @@
 package main
 
 import (
-	gloglog "github.com/golang/glog"
+	"github.com/golang/glog"
 )
 
 type ILogger interface {
@@ -98,61 +98,61 @@ func (this *GLog) Println(args ...interface{}) {
 }
 
 func (this *GLog) Info(args ...interface{}) {
-	gloglog.Info(args)
+	glog.Info(args)
 }
 
 func (this *GLog) Infof(format string, args ...interface{}) {
-	gloglog.Infof(format, args)
+	glog.Infof(format, args)
 }
 
 func (this *GLog) Infoln(args ...interface{}) {
-	gloglog.Infoln(args)
+	glog.Infoln(args)
 }
 
 func (this *GLog) Warning(args ...interface{}) {
-	gloglog.Warning(args)
+	glog.Warning(args)
 }
 
 func (this *GLog) Warningln(args ...interface{}) {
-	gloglog.Warningln(args)
+	glog.Warningln(args)
 }
 
 func (this *GLog) Warningf(format string, args ...interface{}) {
-	gloglog.Warningf(format, args)
+	glog.Warningf(format, args)
 }
 
 func (this *GLog) Error(args ...interface{}) {
-	gloglog.Error(args)
+	glog.Error(args)
 }
 
 func (this *GLog) Errorf(format string, args ...interface{}) {
-	gloglog.Errorf(format, args)
+	glog.Errorf(format, args)
 }
 
 func (this *GLog) Errorln(args ...interface{}) {
-	gloglog.Errorln(args)
+	glog.Errorln(args)
 }
 
 func (this *GLog) Fatal(args ...interface{}) {
-	gloglog.Fatal(args)
+	glog.Fatal(args)
 }
 
 func (this *GLog) Fatalln(args ...interface{}) {
-	gloglog.Fatalln(args)
+	glog.Fatalln(args)
 }
 
 func (this *GLog) Fatalf(format string, args ...interface{}) {
-	gloglog.Fatalf(format, args)
+	glog.Fatalf(format, args)
 }
 
 func (this *GLog) Flush() {
-	gloglog.Flush()
+	glog.Flush()
 }
 
 var (
-	glog ILogger = NewDefaultLogger()
+	xlog ILogger = NewGLog()
 )
 
 func SetLogger(log ILogger) {
-	glog = log
+	xlog = log
 }

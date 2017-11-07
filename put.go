@@ -6,7 +6,7 @@ import (
 	"runtime/debug"
 	"time"
 
-	"github.com/golang/glog"
+	"github.com/coreos/etcd/clientv3"
 	uuid "github.com/satori/go.uuid"
 )
 
@@ -22,30 +22,35 @@ type Put struct {
 	chanStop chan int
 }
 
-func (this *Put) Open(derived IPut, nodeType int, putInterval int64) {
-	this.Derived = derived
+func (this *Put) Open(nodeType int, putInterval int64) {
 	this.nodeId = fmt.Sprintf("%d-%s", nodeType, uuid.NewV1().String())
-	glog.Infoln("node id:", this.nodeId)
+	clientv3.GetLogger().Println("node id:", this.nodeId)
 	go this.put(nodeType, putInterval)
 }
 
 func (this *Put) put(nodeType int, putInterval int64) {
 	defer func() {
 		if err := recover(); err != nil {
-			glog.Errorln("[异常] ", err, "\n", string(debug.Stack()))
+			clientv3.GetLogger().Fatalln("[异常] ", err, "\n", string(debug.Stack()))
 		}
 		this.Derived.Close()
 	}()
-	this.tick = time.NewTicker(time.Duration(putInterval) * time.Millisecond)
+	this.tick = time.NewTicker(time.Duration(putInterval) * time.Second)
 	for {
 		select {
 		case <-this.tick.C:
-			if this.Derived.GetClient() == nil {
+			cli := this.Derived.GetClient()
+			if cli == nil {
 				return
 			}
-			_, err := this.Derived.GetClient().Put(context.TODO(), this.nodeId, this.Derived.GetPutData())
+			resp, err := cli.Grant(context.TODO(), putInterval+5)
 			if err != nil {
-				glog.Errorln(err)
+				clientv3.GetLogger().Fatal(err)
+			} else {
+				_, err = cli.Put(context.TODO(), this.nodeId, this.Derived.GetPutData(), clientv3.WithLease(resp.ID))
+				if err != nil {
+					clientv3.GetLogger().Fatalln(err)
+				}
 			}
 		case <-this.chanStop:
 			return
