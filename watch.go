@@ -30,10 +30,10 @@ func (this *Watch) Open(watchNodeTypes []int) {
 }
 
 func (this *Watch) watch(nodeType int) {
-	clientv3.GetLogger().Println("start watch node, node type =", nodeType)
+	this.Derived.GetLogger().Infoln("start watch node, node type =", nodeType)
 	defer func() {
 		if err := recover(); err != nil {
-			clientv3.GetLogger().Fatalln("[异常] ", err, "\n", string(debug.Stack()))
+			this.Derived.GetLogger().Errorln("[异常] ", err, "\n", string(debug.Stack()))
 		}
 		this.Derived.Close()
 	}()
@@ -56,8 +56,6 @@ func (this *Watch) watch(nodeType int) {
 				if _, ok := this.nodes[nodeType][key]; ok {
 					delete(this.nodes[nodeType], key)
 					this.Derived.OnNodeLeave(nodeType, key)
-				} else {
-					clientv3.GetLogger().Fatalln("error event! event = DELETE, key =", key)
 				}
 			} else {
 				panic("unknow error!")

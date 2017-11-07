@@ -9,8 +9,9 @@ import (
 
 type INode interface {
 	Id() string
-	GetClient() *clientv3.Client
 	Close()
+	GetClient() *clientv3.Client
+	GetLogger() ILogger
 }
 
 type Node struct {
@@ -22,6 +23,7 @@ type Node struct {
 	watchNodeTypes []int
 	putInterval    int64
 	mutex          sync.Mutex
+	log            ILogger
 }
 
 func (this *Node) Init(inst interface{}) {
@@ -40,7 +42,7 @@ func (this *Node) Open(hosts []string, nodeType int, watchNodeTypes []int, putIn
 	})
 	this.client = cli
 	if err != nil {
-		clientv3.GetLogger().Fatalln(err)
+		this.log.Errorln(err)
 		go this.reopen()
 		return
 	}
@@ -50,10 +52,6 @@ func (this *Node) Open(hosts []string, nodeType int, watchNodeTypes []int, putIn
 	if nodeType != 0 {
 		this.Put.Open(nodeType, putInterval)
 	}
-}
-
-func (this *Node) SetLogger(log clientv3.Logger) {
-	clientv3.SetLogger(log)
 }
 
 func (this *Node) Close() {
@@ -68,7 +66,7 @@ func (this *Node) Close() {
 }
 
 func (this *Node) reopen() {
-	clientv3.GetLogger().Println("reopen after 5 sec.")
+	this.log.Infoln("reopen after 5 sec.")
 	t := time.NewTimer(5 * time.Second)
 	select {
 	case <-t.C:
@@ -82,6 +80,14 @@ func (this *Node) Id() string {
 
 func (this *Node) GetClient() *clientv3.Client {
 	return this.client
+}
+
+func (this *Node) GetLogger() ILogger {
+	return this.log
+}
+
+func (this *Node) SetLogger(log ILogger) {
+	this.log = log
 }
 
 // 子类可以根据需要重载下面的方法

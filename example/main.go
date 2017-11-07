@@ -55,7 +55,7 @@ func main() {
 	}
 
 	node := NewMyNode()
-	node.SetLogger(NewGLog())
+	node.SetLogger(xlog)
 	node.Open(strings.Split(hosts, ","), nodeType, wnt, putInterval)
 
 	for {

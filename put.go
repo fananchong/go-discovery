@@ -24,14 +24,14 @@ type Put struct {
 
 func (this *Put) Open(nodeType int, putInterval int64) {
 	this.nodeId = fmt.Sprintf("%d-%s", nodeType, uuid.NewV1().String())
-	clientv3.GetLogger().Println("node id:", this.nodeId)
+	this.Derived.GetLogger().Infoln("node id:", this.nodeId)
 	go this.put(nodeType, putInterval)
 }
 
 func (this *Put) put(nodeType int, putInterval int64) {
 	defer func() {
 		if err := recover(); err != nil {
-			clientv3.GetLogger().Fatalln("[异常] ", err, "\n", string(debug.Stack()))
+			this.Derived.GetLogger().Errorln("[异常] ", err, "\n", string(debug.Stack()))
 		}
 		this.Derived.Close()
 	}()
@@ -45,11 +45,11 @@ func (this *Put) put(nodeType int, putInterval int64) {
 			}
 			resp, err := cli.Grant(context.TODO(), putInterval+5)
 			if err != nil {
-				clientv3.GetLogger().Fatal(err)
+				this.Derived.GetLogger().Errorln(err)
 			} else {
 				_, err = cli.Put(context.TODO(), this.nodeId, this.Derived.GetPutData(), clientv3.WithLease(resp.ID))
 				if err != nil {
-					clientv3.GetLogger().Fatalln(err)
+					this.Derived.GetLogger().Errorln(err)
 				}
 			}
 		case <-this.chanStop:
