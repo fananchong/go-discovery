@@ -2,10 +2,11 @@ package main
 
 import (
 	"flag"
-	"github.com/fananchong/go-discovery"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/fananchong/go-discovery"
 )
 
 type MyNode struct {
@@ -52,6 +53,7 @@ func main() {
 	}
 
 	node := NewMyNode()
+	node.SetLogger(NewGLog())
 	node.Open(strings.Split(hosts, ","), nodeType, wnt, putInterval)
 
 	for {

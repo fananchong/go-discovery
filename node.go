@@ -1,12 +1,14 @@
 package godiscovery
 
 import (
+	"sync"
+	"time"
+
 	"github.com/coreos/etcd/clientv3"
 	"github.com/golang/glog"
-	"time"
 )
 
-type IEtcd interface {
+type INode interface {
 	GetClient() *clientv3.Client
 	Close()
 }
@@ -14,19 +16,29 @@ type IEtcd interface {
 type Node struct {
 	Watch
 	Put
-	client *clientv3.Client
+	client         *clientv3.Client
+	hosts          []string
+	nodeType       int
+	watchNodeTypes []int
+	putInterval    int64
+	mutex          sync.Mutex
 }
 
 func (this *Node) Open(hosts []string, nodeType int, watchNodeTypes []int, putInterval int64) {
-	clientv3.SetLogger(NewLogger())
+	this.hosts = hosts
+	this.nodeType = nodeType
+	this.watchNodeTypes = watchNodeTypes
+	this.putInterval = putInterval
 	cli, err := clientv3.New(clientv3.Config{
 		Endpoints:   hosts,
 		DialTimeout: 5 * time.Second,
 	})
+	this.client = cli
 	if err != nil {
 		glog.Errorln(err)
+		go this.reopen()
+		return
 	}
-	this.client = cli
 	if len(watchNodeTypes) != 0 {
 		this.Watch.Open(this, watchNodeTypes)
 	}
@@ -35,13 +47,32 @@ func (this *Node) Open(hosts []string, nodeType int, watchNodeTypes []int, putIn
 	}
 }
 
+func (this *Node) SetLogger(log clientv3.Logger) {
+	clientv3.SetLogger(log)
+}
+
 func (this *Node) Close() {
+	this.mutex.Lock()
+	defer this.mutex.Unlock()
 	if this.client != nil {
 		this.client.Close()
 		this.client = nil
 	}
 	this.Put.Close()
 	this.Watch.Close()
+}
+
+func (this *Node) reopen() {
+	glog.Infoln("reopen after 5 sec.")
+	t := time.NewTimer(5 * time.Second)
+	select {
+	case <-t.C:
+		this.Open(this.hosts, this.nodeType, this.watchNodeTypes, this.putInterval)
+	}
+}
+
+func (this *Node) Id() string {
+	return this.Put.nodeId
 }
 
 func (this *Node) GetClient() *clientv3.Client {

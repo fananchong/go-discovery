@@ -1,31 +1,29 @@
 package godiscovery
 
 import (
+	"context"
 	"fmt"
-	"github.com/golang/glog"
-	"github.com/satori/go.uuid"
-	"golang.org/x/net/context"
 	"runtime/debug"
 	"time"
+
+	"github.com/golang/glog"
+	uuid "github.com/satori/go.uuid"
 )
 
 type IPut interface {
-	IEtcd
+	INode
 	GetPutData() string
 }
 
 type Put struct {
-	Derived     IPut
-	nodeType    int
-	nodeId      string
-	putInterval int64
-	tick        *time.Ticker
+	Derived  IPut
+	nodeId   string
+	tick     *time.Ticker
+	chanStop chan int
 }
 
 func (this *Put) Open(derived IPut, nodeType int, putInterval int64) {
 	this.Derived = derived
-	this.nodeType = nodeType
-	this.putInterval = putInterval
 	this.nodeId = fmt.Sprintf("%d-%s", nodeType, uuid.NewV1().String())
 	glog.Infoln("node id:", this.nodeId)
 	go this.put(nodeType, putInterval)
@@ -38,15 +36,19 @@ func (this *Put) put(nodeType int, putInterval int64) {
 		}
 		this.Derived.Close()
 	}()
-
 	this.tick = time.NewTicker(time.Duration(putInterval) * time.Millisecond)
 	for {
 		select {
 		case <-this.tick.C:
+			if this.Derived.GetClient() == nil {
+				return
+			}
 			_, err := this.Derived.GetClient().Put(context.TODO(), this.nodeId, this.Derived.GetPutData())
 			if err != nil {
 				glog.Errorln(err)
 			}
+		case <-this.chanStop:
+			return
 		}
 	}
 }
@@ -56,4 +58,5 @@ func (this *Put) Close() {
 		this.tick.Stop()
 		this.tick = nil
 	}
+	this.chanStop <- 1
 }
