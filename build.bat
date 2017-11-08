@@ -3,4 +3,3 @@ set BASEDIR=%CURDIR:\src\github.com\fananchong\go-discovery\=\%
 set GOPATH=%BASEDIR%;%CURDIR%\Godeps
 set GOBIN=%CURDIR%\bin
 go install ./example
-pause
