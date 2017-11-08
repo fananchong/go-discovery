@@ -1,6 +1,8 @@
 package godiscovery
 
 import (
+	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -52,6 +54,16 @@ func (this *Node) Open(hosts []string, nodeType int, watchNodeTypes []int, putIn
 	if nodeType != 0 {
 		this.Put.Open(nodeType, putInterval)
 	}
+}
+
+func (this *Node) OpenByStr(hostsStr string, nodeType int, watchNodeTypesStr string, putInterval int64) {
+	hosts := strings.Split(hostsStr, ",")
+	var watchNodeTypes []int
+	for _, val := range strings.Split(watchNodeTypesStr, ",") {
+		v, _ := strconv.Atoi(val)
+		watchNodeTypes = append(watchNodeTypes, v)
+	}
+	this.Open(hosts, nodeType, watchNodeTypes, putInterval)
 }
 
 func (this *Node) Close() {

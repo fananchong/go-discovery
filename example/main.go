@@ -2,8 +2,6 @@ package main
 
 import (
 	"flag"
-	"strconv"
-	"strings"
 	"time"
 
 	"github.com/fananchong/go-discovery"
@@ -48,15 +46,9 @@ func main() {
 
 	flag.Parse()
 
-	var wnt []int
-	for _, val := range strings.Split(watchNodeTypes, ",") {
-		v, _ := strconv.Atoi(val)
-		wnt = append(wnt, v)
-	}
-
 	node := NewMyNode()
 	node.SetLogger(xlog)
-	node.Open(strings.Split(hosts, ","), nodeType, wnt, putInterval)
+	node.OpenByStr(hosts, nodeType, watchNodeTypes, putInterval)
 
 	for {
 		time.Sleep(time.Minute)
