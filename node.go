@@ -11,9 +11,13 @@ import (
 
 type INode interface {
 	Id() string
+	Init(inst interface{})
+	Open(hosts []string, nodeType int, watchNodeTypes []int, putInterval int64)
+	OpenByStr(hostsStr string, nodeType int, watchNodeTypesStr string, putInterval int64)
 	Close()
 	GetClient() *clientv3.Client
 	GetLogger() ILogger
+	SetLogger(log ILogger)
 }
 
 type Node struct {
