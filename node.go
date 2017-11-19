@@ -65,10 +65,15 @@ func (this *Node) Open(hosts []string, nodeType int, watchNodeTypes []int, putIn
 
 func (this *Node) OpenByStr(hostsStr string, nodeType int, watchNodeTypesStr string, putInterval int64) {
 	hosts := strings.Split(hostsStr, ",")
-	var watchNodeTypes []int
-	for _, val := range strings.Split(watchNodeTypesStr, ",") {
-		v, _ := strconv.Atoi(val)
-		watchNodeTypes = append(watchNodeTypes, v)
+	var watchNodeTypes []int = make([]int, 0)
+	if watchNodeTypesStr != "" {
+		for _, val := range strings.Split(watchNodeTypesStr, ",") {
+			v, _ := strconv.Atoi(val)
+			if v == 0 {
+				continue
+			}
+			watchNodeTypes = append(watchNodeTypes, v)
+		}
 	}
 	this.Open(hosts, nodeType, watchNodeTypes, putInterval)
 }
