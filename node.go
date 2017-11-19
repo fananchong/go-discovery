@@ -19,6 +19,7 @@ type INode interface {
 	GetClient() *clientv3.Client
 	GetLogger() ILogger
 	SetLogger(log ILogger)
+	GetBase() interface{}
 }
 
 type Node struct {
@@ -137,4 +138,8 @@ func (this *Node) OnNodeLeave(nodeType int, id string) {
 
 func (this *Node) GetPutData() (string, error) {
 	return "", nil
+}
+
+func (this *Node) GetBase() interface{} {
+	return this
 }
