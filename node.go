@@ -11,6 +11,7 @@ import (
 
 type INode interface {
 	Id() string
+	SetId(id string)
 	Init(inst interface{})
 	Open(hosts []string, nodeType int, watchNodeTypes []int, putInterval int64)
 	OpenByStr(hostsStr string, nodeType int, watchNodeTypesStr string, putInterval int64)
@@ -28,7 +29,8 @@ type Node struct {
 	nodeType       int
 	watchNodeTypes []int
 	putInterval    int64
-	mutex          sync.Mutex
+	mutexClose     sync.Mutex
+	mutexVar       sync.RWMutex
 	log            ILogger
 }
 
@@ -71,8 +73,8 @@ func (this *Node) OpenByStr(hostsStr string, nodeType int, watchNodeTypesStr str
 }
 
 func (this *Node) Close() {
-	this.mutex.Lock()
-	defer this.mutex.Unlock()
+	this.mutexClose.Lock()
+	defer this.mutexClose.Unlock()
 	if this.client != nil {
 		this.client.Close()
 		this.client = nil
@@ -91,18 +93,32 @@ func (this *Node) reopen() {
 }
 
 func (this *Node) Id() string {
+	this.mutexVar.RLock()
+	defer this.mutexVar.RUnlock()
 	return this.Put.nodeId
 }
 
+func (this *Node) SetId(id string) {
+	this.mutexVar.Lock()
+	defer this.mutexVar.Unlock()
+	this.Put.nodeId = id
+}
+
 func (this *Node) GetClient() *clientv3.Client {
+	this.mutexVar.RLock()
+	defer this.mutexVar.RUnlock()
 	return this.client
 }
 
 func (this *Node) GetLogger() ILogger {
+	this.mutexVar.RLock()
+	defer this.mutexVar.RUnlock()
 	return this.log
 }
 
 func (this *Node) SetLogger(log ILogger) {
+	this.mutexVar.Lock()
+	defer this.mutexVar.Unlock()
 	this.log = log
 }
 
@@ -119,6 +135,6 @@ func (this *Node) OnNodeLeave(nodeType int, id string) {
 
 }
 
-func (this *Node) GetPutData() string {
-	return ""
+func (this *Node) GetPutData() (string, error) {
+	return "", nil
 }

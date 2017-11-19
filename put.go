@@ -12,7 +12,7 @@ import (
 
 type IPut interface {
 	INode
-	GetPutData() string
+	GetPutData() (string, error)
 }
 
 type Put struct {
@@ -23,8 +23,9 @@ type Put struct {
 }
 
 func (this *Put) Open(nodeType int, putInterval int64) {
-	this.nodeId = fmt.Sprintf("%d-%s", nodeType, uuid.NewV1().String())
-	this.Derived.GetLogger().Infoln("node id:", this.nodeId)
+	nodeId := fmt.Sprintf("%d-%s", nodeType, uuid.NewV1().String())
+	this.Derived.SetId(nodeId)
+	this.Derived.GetLogger().Infoln("node id:", nodeId)
 	go this.put(nodeType, putInterval)
 }
 
@@ -47,9 +48,13 @@ func (this *Put) put(nodeType int, putInterval int64) {
 			if err != nil {
 				this.Derived.GetLogger().Errorln(err)
 			} else {
-				_, err = cli.Put(context.TODO(), this.nodeId, this.Derived.GetPutData(), clientv3.WithLease(resp.ID))
-				if err != nil {
-					this.Derived.GetLogger().Errorln(err)
+				var data string
+				data, err = this.Derived.GetPutData()
+				if err == nil {
+					_, err = cli.Put(context.TODO(), this.Derived.Id(), data, clientv3.WithLease(resp.ID))
+					if err != nil {
+						this.Derived.GetLogger().Errorln(err)
+					}
 				}
 			}
 		case <-this.chanStop:

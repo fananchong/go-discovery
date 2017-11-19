@@ -29,8 +29,8 @@ func (this *MyNode) OnNodeLeave(nodeType int, id string) {
 	xlog.Infoln("OnNodeLeave: nodeType =", nodeType, "id =", id)
 }
 
-func (this *MyNode) GetPutData() string {
-	return ""
+func (this *MyNode) GetPutData() (string, error) {
+	return "", nil
 }
 
 func main() {
