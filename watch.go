@@ -18,24 +18,29 @@ type IWatch interface {
 }
 
 type Watch struct {
-	Derived IWatch
-	nodes   map[int]map[string]int
-	mutex   sync.Mutex
+	Derived   IWatch
+	nodes     map[int]map[string]int
+	mutex     sync.Mutex
+	ctx       context.Context
+	ctxCancel context.CancelFunc
 }
 
-func (this *Watch) Open(watchNodeTypes []int) {
+func (this *Watch) Open(root context.Context, watchNodeTypes []int) {
+	this.ctx, this.ctxCancel = context.WithCancel(root)
 	this.nodes = make(map[int]map[string]int)
 	for _, nodeType := range watchNodeTypes {
+		this.mutex.Lock()
 		this.nodes[nodeType] = make(map[string]int)
+		this.mutex.Unlock()
 		go this.watch(nodeType)
 	}
 }
 
 func (this *Watch) watch(nodeType int) {
-	this.Derived.GetLogger().Infoln("start watch node, node type =", nodeType)
+	xlog.Infoln("start watch node, node type =", nodeType)
 	defer func() {
 		if err := recover(); err != nil {
-			this.Derived.GetLogger().Errorln("[异常] ", err, "\n", string(debug.Stack()))
+			xlog.Errorln("[异常] ", err, "\n", string(debug.Stack()))
 		}
 		this.Derived.Close()
 	}()
@@ -71,7 +76,4 @@ func (this *Watch) watch(nodeType int) {
 			}
 		}
 	}
-}
-
-func (this *Watch) Close() {
 }

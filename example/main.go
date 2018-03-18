@@ -2,9 +2,10 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"time"
 
-	"github.com/fananchong/go-discovery"
+	godiscovery "github.com/fananchong/go-discovery"
 )
 
 type MyNode struct {
@@ -18,15 +19,15 @@ func NewMyNode() *MyNode {
 }
 
 func (this *MyNode) OnNodeUpdate(nodeType int, id string, data []byte) {
-	xlog.Infoln("OnNodeUpdate: nodeType =", nodeType, "id =", id, "data =", data)
+	fmt.Println("OnNodeUpdate: nodeType =", nodeType, "id =", id, "data =", data)
 }
 
 func (this *MyNode) OnNodeJoin(nodeType int, id string, data []byte) {
-	xlog.Infoln("OnNodeJoin: nodeType =", nodeType, "id =", id, "data =", data)
+	fmt.Println("OnNodeJoin: nodeType =", nodeType, "id =", id, "data =", data)
 }
 
 func (this *MyNode) OnNodeLeave(nodeType int, id string) {
-	xlog.Infoln("OnNodeLeave: nodeType =", nodeType, "id =", id)
+	fmt.Println("OnNodeLeave: nodeType =", nodeType, "id =", id)
 }
 
 func (this *MyNode) GetPutData() (string, error) {
@@ -47,7 +48,6 @@ func main() {
 	flag.Parse()
 
 	node := NewMyNode()
-	node.SetLogger(xlog)
 	node.OpenByStr(hosts, nodeType, watchNodeTypes, putInterval)
 
 	for {
