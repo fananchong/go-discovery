@@ -40,12 +40,12 @@ func (this *Watch) watch(nodeType int) {
 	xlog.Infoln("start watch node, node type =", nodeType)
 	defer func() {
 		if err := recover(); err != nil {
-			xlog.Errorln("[异常] ", err, "\n", string(debug.Stack()))
+			xlog.Errorln("[except] ", err, "\n", string(debug.Stack()))
 		}
-		this.Derived.Close()
+		go this.watch(nodeType)
 	}()
 	prefix := strconv.Itoa(nodeType) + "-"
-	rch := this.Derived.GetClient().Watch(context.Background(), prefix, clientv3.WithPrefix())
+	rch := this.Derived.GetClient().Watch(this.ctx, prefix, clientv3.WithPrefix())
 	for wresp := range rch {
 		for _, ev := range wresp.Events {
 			key := string(ev.Kv.Key)

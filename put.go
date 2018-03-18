@@ -34,9 +34,9 @@ func (this *Put) Open(root context.Context, nodeType int, putInterval int64) {
 func (this *Put) put(nodeType int, putInterval int64) {
 	defer func() {
 		if err := recover(); err != nil {
-			xlog.Errorln("[异常] ", err, "\n", string(debug.Stack()))
+			xlog.Errorln("[except] ", err, "\n", string(debug.Stack()))
 		}
-		this.Derived.Close()
+		go this.put(nodeType, putInterval)
 	}()
 	tick := time.NewTicker(time.Duration(putInterval) * time.Second)
 	for {

@@ -3,6 +3,8 @@ package main
 import (
 	"flag"
 	"fmt"
+	"net/http"
+	_ "net/http/pprof"
 	"time"
 
 	godiscovery "github.com/fananchong/go-discovery"
@@ -36,6 +38,10 @@ func (this *MyNode) GetPutData() (string, error) {
 
 func main() {
 
+	pprof_port := 0
+	flag.IntVar(&pprof_port, "pprofPort", 3000, "pprof port")
+	go http.ListenAndServe(fmt.Sprintf(":%d", pprof_port), nil)
+
 	hosts := ""
 	flag.StringVar(&hosts, "hosts", "192.168.1.4:12379,192.168.1.4:22379,192.168.1.4:32379", "etcd hosts")
 	nodeType := 0
@@ -47,10 +53,11 @@ func main() {
 
 	flag.Parse()
 
-	node := NewMyNode()
-	node.OpenByStr(hosts, nodeType, watchNodeTypes, putInterval)
-
 	for {
-		time.Sleep(time.Minute)
+		node := NewMyNode()
+		node.OpenByStr(hosts, nodeType, watchNodeTypes, putInterval)
+
+		time.Sleep(10 * time.Minute)
+		node.Close()
 	}
 }
