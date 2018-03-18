@@ -32,32 +32,34 @@
 			"Rev": "95a726a27e09030f9ccbd9982a1508f5a6d25ada"
 		},
 		{
-			"ImportPath": "github.com/golang/glog",
-			"Rev": "23def4e6c14b4da8ac2ed8007337bc5eb5007998"
-		},
-		{
 			"ImportPath": "github.com/golang/protobuf/proto",
-			"Rev": "1e59b77b52bf8e4b449a57e6f79f21226d571845"
+			"Comment": "v1.0.0-1-gbbd03ef",
+			"Rev": "bbd03ef6da3a115852eaf24c8a1c46aeb39aa175"
 		},
 		{
 			"ImportPath": "github.com/golang/protobuf/protoc-gen-go/descriptor",
-			"Rev": "1e59b77b52bf8e4b449a57e6f79f21226d571845"
+			"Comment": "v1.0.0-1-gbbd03ef",
+			"Rev": "bbd03ef6da3a115852eaf24c8a1c46aeb39aa175"
 		},
 		{
 			"ImportPath": "github.com/golang/protobuf/ptypes",
-			"Rev": "1e59b77b52bf8e4b449a57e6f79f21226d571845"
+			"Comment": "v1.0.0-1-gbbd03ef",
+			"Rev": "bbd03ef6da3a115852eaf24c8a1c46aeb39aa175"
 		},
 		{
 			"ImportPath": "github.com/golang/protobuf/ptypes/any",
-			"Rev": "1e59b77b52bf8e4b449a57e6f79f21226d571845"
+			"Comment": "v1.0.0-1-gbbd03ef",
+			"Rev": "bbd03ef6da3a115852eaf24c8a1c46aeb39aa175"
 		},
 		{
 			"ImportPath": "github.com/golang/protobuf/ptypes/duration",
-			"Rev": "1e59b77b52bf8e4b449a57e6f79f21226d571845"
+			"Comment": "v1.0.0-1-gbbd03ef",
+			"Rev": "bbd03ef6da3a115852eaf24c8a1c46aeb39aa175"
 		},
 		{
 			"ImportPath": "github.com/golang/protobuf/ptypes/timestamp",
-			"Rev": "1e59b77b52bf8e4b449a57e6f79f21226d571845"
+			"Comment": "v1.0.0-1-gbbd03ef",
+			"Rev": "bbd03ef6da3a115852eaf24c8a1c46aeb39aa175"
 		},
 		{
 			"ImportPath": "github.com/satori/go.uuid",
