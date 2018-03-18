@@ -35,8 +35,8 @@ func (this *Put) put(nodeType int, putInterval int64) {
 	defer func() {
 		if err := recover(); err != nil {
 			xlog.Errorln("[except] ", err, "\n", string(debug.Stack()))
+			go this.put(nodeType, putInterval)
 		}
-		go this.put(nodeType, putInterval)
 	}()
 	tick := time.NewTicker(time.Duration(putInterval) * time.Second)
 	for {

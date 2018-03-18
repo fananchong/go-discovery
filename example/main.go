@@ -40,7 +40,6 @@ func main() {
 
 	pprof_port := 0
 	flag.IntVar(&pprof_port, "pprofPort", 3000, "pprof port")
-	go http.ListenAndServe(fmt.Sprintf(":%d", pprof_port), nil)
 
 	hosts := ""
 	flag.StringVar(&hosts, "hosts", "192.168.1.4:12379,192.168.1.4:22379,192.168.1.4:32379", "etcd hosts")
@@ -53,11 +52,14 @@ func main() {
 
 	flag.Parse()
 
+	go http.ListenAndServe(fmt.Sprintf(":%d", pprof_port), nil)
+
 	for {
 		node := NewMyNode()
 		node.OpenByStr(hosts, nodeType, watchNodeTypes, putInterval)
 
-		time.Sleep(10 * time.Minute)
+		time.Sleep(10 * time.Second)
+		fmt.Println("node close .....................")
 		node.Close()
 	}
 }

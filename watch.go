@@ -41,11 +41,17 @@ func (this *Watch) watch(nodeType int) {
 	defer func() {
 		if err := recover(); err != nil {
 			xlog.Errorln("[except] ", err, "\n", string(debug.Stack()))
+			if this.Derived.GetClient() != nil {
+				go this.watch(nodeType)
+			}
 		}
-		go this.watch(nodeType)
 	}()
 	prefix := strconv.Itoa(nodeType) + "-"
-	rch := this.Derived.GetClient().Watch(this.ctx, prefix, clientv3.WithPrefix())
+	cli := this.Derived.GetClient()
+	if cli == nil {
+		return
+	}
+	rch := cli.Watch(this.ctx, prefix, clientv3.WithPrefix())
 	for wresp := range rch {
 		for _, ev := range wresp.Events {
 			key := string(ev.Kv.Key)
