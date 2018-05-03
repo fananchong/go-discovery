@@ -7,12 +7,12 @@ import (
 	"time"
 
 	"github.com/coreos/etcd/clientv3"
-	uuid "github.com/satori/go.uuid"
 )
 
 type IPut interface {
 	INode
 	GetPutData() (string, error)
+	NewNodeId() (string, error)
 }
 
 type Put struct {
@@ -22,13 +22,17 @@ type Put struct {
 	ctxCancel context.CancelFunc
 }
 
-func (this *Put) Open(root context.Context, nodeType int, putInterval int64) {
+func (this *Put) Open(root context.Context, nodeType int, putInterval int64) error {
 	this.ctx, this.ctxCancel = context.WithCancel(root)
-	u, _ := uuid.NewV1()
-	nodeId := fmt.Sprintf("%d-%s", nodeType, u.String())
+	u, err := this.Derived.NewNodeId()
+	if err != nil {
+		return err
+	}
+	nodeId := fmt.Sprintf("%d-%s", nodeType, u)
 	this.Derived.SetId(nodeId)
 	xlog.Infoln("node id:", nodeId)
 	go this.put(nodeType, putInterval)
+	return nil
 }
 
 func (this *Put) put(nodeType int, putInterval int64) {

@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/coreos/etcd/clientv3"
+	uuid "github.com/satori/go.uuid"
 )
 
 type INode interface {
@@ -57,11 +58,18 @@ func (this *Node) Open(hosts []string, nodeType int, watchNodeTypes []int, putIn
 		go this.reopen()
 		return
 	}
+	if nodeType != 0 {
+		if err := this.Put.Open(this.ctx, nodeType, putInterval); err != nil {
+			xlog.Errorln(err)
+			if cli != nil {
+				cli.Close()
+			}
+			go this.reopen()
+			return
+		}
+	}
 	if len(watchNodeTypes) != 0 {
 		this.Watch.Open(this.ctx, watchNodeTypes)
-	}
-	if nodeType != 0 {
-		this.Put.Open(this.ctx, nodeType, putInterval)
 	}
 }
 
@@ -136,6 +144,14 @@ func (this *Node) OnNodeLeave(nodeType int, id string) {
 
 func (this *Node) GetPutData() (string, error) {
 	return "", nil
+}
+
+func (this *Node) NewNodeId() (string, error) {
+	id, err := uuid.NewV1()
+	if err != nil {
+		return "", err
+	}
+	return id.String(), nil
 }
 
 func (this *Node) GetBase() interface{} {

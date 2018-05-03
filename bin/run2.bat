@@ -1,1 +1,1 @@
-example.exe --hosts=192.168.1.12:12379,192.168.1.12:22379,192.168.1.12:32379 --nodeType=2 --watchNodeTypes=1 --putInterval=1 --pprofPort=3002
+example.exe --hosts=101.132.47.70:12379,101.132.47.70:22379,101.132.47.70:32379 --nodeType=2 --watchNodeTypes=1,2 --putInterval=1 --pprofPort=3002
