@@ -55,6 +55,27 @@ func main() {
 ```
 
 
+### main函数中参数说明
+
+  - hosts
+
+    etcd 地址列表
+
+  - nodeType
+
+    自己节点的类型，非0，则定期(putInterval)调用GetPutData函数，上传数据
+
+  - watchNodeTypes
+
+    要监听的节点类型列表。非空，则OnNodeUpdate、OnNodeJoin、OnNodeLeave会被触发
+  
+
+  - putInterval
+
+    调用GetPutData函数的频率，单位秒
+
+
+
 ### API使用注意事项
 
 **OnNodeUpdate、OnNodeJoin、OnNodeLeave、GetPutData 在内部协程被调用，请注意多协程安全！！！**
@@ -64,9 +85,9 @@ func main() {
 
   - 提供2种Docker Swarm方式部署etcd
 
-	启动脚本                                                                   | 说明
+	启动脚本                                                                  | 说明
 	--------------------------------------------------------------------------|-----
-	docker-swarm/install-etcd-static.sh                                       | 静态配置方式部署etcd
+	docker-swarm/install-etcd-static.sh                                       | 静态配置方式部署etcd
 	docker-swarm/install-discovery.etcd.io.sh<br>docker-swarm/install-etcd.sh | etcd发现方式部署etcd
 
 
