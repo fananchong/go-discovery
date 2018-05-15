@@ -20,16 +20,16 @@ func NewMyNode() *MyNode {
 	return this
 }
 
-func (this *MyNode) OnNodeUpdate(nodeType int, id string, data []byte) {
-	fmt.Println("OnNodeUpdate: nodeType =", nodeType, "id =", id, "data =", data)
+func (this *MyNode) OnNodeUpdate(myIP string, nodeType int, id string, data []byte) {
+	fmt.Println("OnNodeUpdate: myIP =", myIP, "nodeType =", nodeType, "id =", id, "data =", data)
 }
 
-func (this *MyNode) OnNodeJoin(nodeType int, id string, data []byte) {
-	fmt.Println("OnNodeJoin: nodeType =", nodeType, "id =", id, "data =", data)
+func (this *MyNode) OnNodeJoin(myIP string, nodeType int, id string, data []byte) {
+	fmt.Println("OnNodeJoin: myIP =", myIP, "nodeType =", nodeType, "id =", id, "data =", data)
 }
 
-func (this *MyNode) OnNodeLeave(nodeType int, id string) {
-	fmt.Println("OnNodeLeave: nodeType =", nodeType, "id =", id)
+func (this *MyNode) OnNodeLeave(myIP string, nodeType int, id string) {
+	fmt.Println("OnNodeLeave: myIP =", myIP, "nodeType =", nodeType, "id =", id)
 }
 
 func (this *MyNode) GetPutData() (string, error) {
@@ -42,7 +42,9 @@ func main() {
 	flag.IntVar(&pprof_port, "pprofPort", 3000, "pprof port")
 
 	hosts := ""
-	flag.StringVar(&hosts, "hosts", "192.168.1.4:12379,192.168.1.4:22379,192.168.1.4:32379", "etcd hosts")
+	flag.StringVar(&hosts, "hosts", "101.132.47.70:12379,101.132.47.70:22379,101.132.47.70:32379", "etcd hosts")
+	whatsmyip := ""
+	flag.StringVar(&whatsmyip, "whatsmyip", "101.132.47.70:3000", "whatsmyip host")
 	nodeType := 0
 	flag.IntVar(&nodeType, "nodeType", 1, "node type")
 	watchNodeTypes := ""
@@ -56,7 +58,7 @@ func main() {
 
 	for {
 		node := NewMyNode()
-		node.OpenByStr(hosts, nodeType, watchNodeTypes, putInterval)
+		node.OpenByStr(hosts, whatsmyip, nodeType, watchNodeTypes, putInterval)
 
 		time.Sleep(10 * time.Second)
 		fmt.Println("node close .....................")

@@ -12,9 +12,9 @@ import (
 
 type IWatch interface {
 	INode
-	OnNodeUpdate(nodeType int, id string, data []byte)
-	OnNodeJoin(nodeType int, id string, data []byte)
-	OnNodeLeave(nodeType int, id string)
+	OnNodeUpdate(myIP string, nodeType int, id string, data []byte)
+	OnNodeJoin(myIP string, nodeType int, id string, data []byte)
+	OnNodeLeave(myIP string, nodeType int, id string)
 }
 
 type Watch struct {
@@ -23,6 +23,7 @@ type Watch struct {
 	mutex     sync.Mutex
 	ctx       context.Context
 	ctxCancel context.CancelFunc
+	MyIP      string
 }
 
 func (this *Watch) Open(root context.Context, watchNodeTypes []int) {
@@ -62,18 +63,18 @@ func (this *Watch) watch(nodeType int) {
 				this.mutex.Lock()
 				if _, ok := this.nodes[nodeType][key]; ok {
 					this.mutex.Unlock()
-					this.Derived.OnNodeUpdate(nodeType, key, ev.Kv.Value)
+					this.Derived.OnNodeUpdate(this.MyIP, nodeType, key, ev.Kv.Value)
 				} else {
 					this.nodes[nodeType][key] = 1
 					this.mutex.Unlock()
-					this.Derived.OnNodeJoin(nodeType, key, ev.Kv.Value)
+					this.Derived.OnNodeJoin(this.MyIP, nodeType, key, ev.Kv.Value)
 				}
 			} else if ev.Type == mvccpb.DELETE {
 				this.mutex.Lock()
 				if _, ok := this.nodes[nodeType][key]; ok {
 					delete(this.nodes[nodeType], key)
 					this.mutex.Unlock()
-					this.Derived.OnNodeLeave(nodeType, key)
+					this.Derived.OnNodeLeave(this.MyIP, nodeType, key)
 				} else {
 					this.mutex.Unlock()
 				}

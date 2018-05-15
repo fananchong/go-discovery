@@ -2,6 +2,8 @@ package godiscovery
 
 import (
 	"context"
+	"io/ioutil"
+	"net/http"
 	"strconv"
 	"strings"
 	"sync"
@@ -15,7 +17,7 @@ type INode interface {
 	Id() string
 	SetId(id string)
 	Init(inst interface{})
-	Open(hosts []string, nodeType int, watchNodeTypes []int, putInterval int64)
+	Open(hosts []string, whatsmyip string, nodeType int, watchNodeTypes []int, putInterval int64)
 	Close()
 	GetClient() *clientv3.Client
 	GetBase() interface{}
@@ -26,6 +28,7 @@ type Node struct {
 	Put
 	client         *clientv3.Client
 	hosts          []string
+	whatsmyipHost  string
 	nodeType       int
 	watchNodeTypes []int
 	putInterval    int64
@@ -40,8 +43,9 @@ func (this *Node) Init(inst interface{}) {
 	this.Put.Derived = inst.(IPut)
 }
 
-func (this *Node) Open(hosts []string, nodeType int, watchNodeTypes []int, putInterval int64) {
+func (this *Node) Open(hosts []string, whatsmyipHost string, nodeType int, watchNodeTypes []int, putInterval int64) {
 	this.hosts = hosts
+	this.whatsmyipHost = whatsmyipHost
 	this.nodeType = nodeType
 	this.watchNodeTypes = watchNodeTypes
 	this.putInterval = putInterval
@@ -69,11 +73,33 @@ func (this *Node) Open(hosts []string, nodeType int, watchNodeTypes []int, putIn
 		}
 	}
 	if len(watchNodeTypes) != 0 {
+		if whatsmyipHost != "" {
+			resp, err := http.Get("http://" + whatsmyipHost)
+			if err != nil {
+				xlog.Errorln(err)
+				if cli != nil {
+					cli.Close()
+				}
+				go this.reopen()
+				return
+			}
+			defer resp.Body.Close()
+			body, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				xlog.Errorln(err)
+				if cli != nil {
+					cli.Close()
+				}
+				go this.reopen()
+				return
+			}
+			this.Watch.MyIP = string(body)
+		}
 		this.Watch.Open(this.ctx, watchNodeTypes)
 	}
 }
 
-func (this *Node) OpenByStr(hostsStr string, nodeType int, watchNodeTypesStr string, putInterval int64) {
+func (this *Node) OpenByStr(hostsStr string, whatsmyipHost string, nodeType int, watchNodeTypesStr string, putInterval int64) {
 	hosts := strings.Split(hostsStr, ",")
 	var watchNodeTypes []int = make([]int, 0)
 	if watchNodeTypesStr != "" {
@@ -85,7 +111,7 @@ func (this *Node) OpenByStr(hostsStr string, nodeType int, watchNodeTypesStr str
 			watchNodeTypes = append(watchNodeTypes, v)
 		}
 	}
-	this.Open(hosts, nodeType, watchNodeTypes, putInterval)
+	this.Open(hosts, whatsmyipHost, nodeType, watchNodeTypes, putInterval)
 }
 
 func (this *Node) Close() {
@@ -106,7 +132,7 @@ func (this *Node) reopen() {
 	t := time.NewTimer(5 * time.Second)
 	select {
 	case <-t.C:
-		this.Open(this.hosts, this.nodeType, this.watchNodeTypes, this.putInterval)
+		this.Open(this.hosts, this.whatsmyipHost, this.nodeType, this.watchNodeTypes, this.putInterval)
 	}
 }
 
@@ -130,15 +156,15 @@ func (this *Node) GetClient() *clientv3.Client {
 
 // 子类可以根据需要重载下面的方法
 //     注意 OnNodeUpdate、OnNodeJoin、OnNodeLeave、GetPutData 在内部协程被调用，请注意多协程安全！！！
-func (this *Node) OnNodeUpdate(nodeType int, id string, data []byte) {
+func (this *Node) OnNodeUpdate(myIP string, nodeType int, id string, data []byte) {
 
 }
 
-func (this *Node) OnNodeJoin(nodeType int, id string, data []byte) {
+func (this *Node) OnNodeJoin(myIP string, nodeType int, id string, data []byte) {
 
 }
 
-func (this *Node) OnNodeLeave(nodeType int, id string) {
+func (this *Node) OnNodeLeave(myIP string, nodeType int, id string) {
 
 }
 
