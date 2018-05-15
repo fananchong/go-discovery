@@ -15,12 +15,12 @@ func NewMyNode() *MyNode {
 	return this
 }
 
-func (this *MyNode) OnNodeUpdate(nodeType int, id string, data []byte) {
-	fmt.Println("OnNodeUpdate: nodeType =", nodeType, "id =", id, "data =", data)
+func (this *MyNode) OnNodeUpdate(nodeIP string, nodeType int, id string, data []byte) {
+	fmt.Println("OnNodeUpdate: nodeIP =", nodeIP, "nodeType =", nodeType, "id =", id, "data =", data)
 }
 
-func (this *MyNode) OnNodeJoin(nodeType int, id string, data []byte) {
-	fmt.Println("OnNodeJoin: nodeType =", nodeType, "id =", id, "data =", data)
+func (this *MyNode) OnNodeJoin(nodeIP string, nodeType int, id string, data []byte) {
+	fmt.Println("OnNodeJoin: nodeIP =", nodeIP, "nodeType =", nodeType, "id =", id, "data =", data)
 }
 
 func (this *MyNode) OnNodeLeave(nodeType int, id string) {
@@ -28,13 +28,15 @@ func (this *MyNode) OnNodeLeave(nodeType int, id string) {
 }
 
 func (this *MyNode) GetPutData() (string, error) {
-	return "", nil
+	return string([]byte{1, 2, 3, 4}), nil
 }
 
 func main() {
 
 	hosts := ""
-	flag.StringVar(&hosts, "hosts", "192.168.1.4:12379,192.168.1.4:22379,192.168.1.4:32379", "etcd hosts")
+	flag.StringVar(&hosts, "hosts", "101.132.47.70:12379,101.132.47.70:22379,101.132.47.70:32379", "etcd hosts")
+	whatsmyip := ""
+	flag.StringVar(&whatsmyip, "whatsmyip", "101.132.47.70:3000", "whatsmyip host")
 	nodeType := 0
 	flag.IntVar(&nodeType, "nodeType", 1, "node type")
 	watchNodeTypes := ""
@@ -45,7 +47,7 @@ func main() {
 	flag.Parse()
 
 	node := NewMyNode()
-	node.OpenByStr(hosts, nodeType, watchNodeTypes, putInterval)
+	node.OpenByStr(hosts, whatsmyip, nodeType, watchNodeTypes, putInterval)
 
 	for {
 		time.Sleep(time.Minute)
@@ -61,6 +63,10 @@ func main() {
 
     etcd 地址列表
 
+  - whatsmyip
+
+    whatsmyip 地址
+
   - nodeType
 
     自己节点的类型，非0，则定期(putInterval)调用GetPutData函数，上传数据
@@ -68,7 +74,7 @@ func main() {
   - watchNodeTypes
 
     要监听的节点类型列表。非空，则OnNodeUpdate、OnNodeJoin、OnNodeLeave会被触发
-  
+
 
   - putInterval
 
@@ -85,10 +91,14 @@ func main() {
 
   - 提供2种Docker Swarm方式部署etcd
 
-	启动脚本                                                                  | 说明
-	--------------------------------------------------------------------------|-----
-	docker-swarm/install-etcd-static.sh                                       | 静态配置方式部署etcd
-	docker-swarm/install-discovery.etcd.io.sh<br>docker-swarm/install-etcd.sh | etcd发现方式部署etcd
+启动脚本                                                                  | 说明
+-------------------------------------------------------------------------|-----
+docker-swarm/install-etcd-static.sh                                       | 静态配置方式部署etcd
+docker-swarm/install-discovery.etcd.io.sh<br>docker-swarm/install-etcd.sh | etcd发现方式部署etcd
 
 
-  - 封装etcd client api (v3)，使用例子请参见example目录
+### WhatsMyIP部署脚本说明
+
+启动脚本                                     | 说明
+--------------------------------------------|-----
+docker-swarm/install-whatsmyip.sh           | 启动whatsmyip服务

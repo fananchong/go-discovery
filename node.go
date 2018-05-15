@@ -63,16 +63,6 @@ func (this *Node) Open(hosts []string, whatsmyipHost string, nodeType int, watch
 		return
 	}
 	if nodeType != 0 {
-		if err := this.Put.Open(this.ctx, nodeType, putInterval); err != nil {
-			xlog.Errorln(err)
-			if cli != nil {
-				cli.Close()
-			}
-			go this.reopen()
-			return
-		}
-	}
-	if len(watchNodeTypes) != 0 {
 		if whatsmyipHost != "" {
 			resp, err := http.Get("http://" + whatsmyipHost)
 			if err != nil {
@@ -93,8 +83,18 @@ func (this *Node) Open(hosts []string, whatsmyipHost string, nodeType int, watch
 				go this.reopen()
 				return
 			}
-			this.Watch.MyIP = string(body)
+			this.Put.nodeIP = string(body)
 		}
+		if err := this.Put.Open(this.ctx, nodeType, putInterval); err != nil {
+			xlog.Errorln(err)
+			if cli != nil {
+				cli.Close()
+			}
+			go this.reopen()
+			return
+		}
+	}
+	if len(watchNodeTypes) != 0 {
 		this.Watch.Open(this.ctx, watchNodeTypes)
 	}
 }
@@ -156,15 +156,15 @@ func (this *Node) GetClient() *clientv3.Client {
 
 // 子类可以根据需要重载下面的方法
 //     注意 OnNodeUpdate、OnNodeJoin、OnNodeLeave、GetPutData 在内部协程被调用，请注意多协程安全！！！
-func (this *Node) OnNodeUpdate(myIP string, nodeType int, id string, data []byte) {
+func (this *Node) OnNodeUpdate(nodeIP string, nodeType int, id string, data []byte) {
 
 }
 
-func (this *Node) OnNodeJoin(myIP string, nodeType int, id string, data []byte) {
+func (this *Node) OnNodeJoin(nodeIP string, nodeType int, id string, data []byte) {
 
 }
 
-func (this *Node) OnNodeLeave(myIP string, nodeType int, id string) {
+func (this *Node) OnNodeLeave(nodeType int, id string) {
 
 }
 

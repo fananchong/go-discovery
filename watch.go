@@ -4,6 +4,7 @@ import (
 	"context"
 	"runtime/debug"
 	"strconv"
+	"strings"
 	"sync"
 
 	"github.com/coreos/etcd/clientv3"
@@ -12,9 +13,9 @@ import (
 
 type IWatch interface {
 	INode
-	OnNodeUpdate(myIP string, nodeType int, id string, data []byte)
-	OnNodeJoin(myIP string, nodeType int, id string, data []byte)
-	OnNodeLeave(myIP string, nodeType int, id string)
+	OnNodeUpdate(nodeIP string, nodeType int, id string, data []byte)
+	OnNodeJoin(nodeIP string, nodeType int, id string, data []byte)
+	OnNodeLeave(nodeType int, id string)
 }
 
 type Watch struct {
@@ -23,7 +24,6 @@ type Watch struct {
 	mutex     sync.Mutex
 	ctx       context.Context
 	ctxCancel context.CancelFunc
-	MyIP      string
 }
 
 func (this *Watch) Open(root context.Context, watchNodeTypes []int) {
@@ -60,21 +60,24 @@ func (this *Watch) watch(nodeType int) {
 				continue
 			}
 			if ev.Type == mvccpb.PUT {
+				temp := string(ev.Kv.Value)
+				nodeIP := strings.Split(temp, "#")[0]
+				data := ev.Kv.Value[len(nodeIP)+1:]
 				this.mutex.Lock()
 				if _, ok := this.nodes[nodeType][key]; ok {
 					this.mutex.Unlock()
-					this.Derived.OnNodeUpdate(this.MyIP, nodeType, key, ev.Kv.Value)
+					this.Derived.OnNodeUpdate(nodeIP, nodeType, key, data)
 				} else {
 					this.nodes[nodeType][key] = 1
 					this.mutex.Unlock()
-					this.Derived.OnNodeJoin(this.MyIP, nodeType, key, ev.Kv.Value)
+					this.Derived.OnNodeJoin(nodeIP, nodeType, key, data)
 				}
 			} else if ev.Type == mvccpb.DELETE {
 				this.mutex.Lock()
 				if _, ok := this.nodes[nodeType][key]; ok {
 					delete(this.nodes[nodeType], key)
 					this.mutex.Unlock()
-					this.Derived.OnNodeLeave(this.MyIP, nodeType, key)
+					this.Derived.OnNodeLeave(nodeType, key)
 				} else {
 					this.mutex.Unlock()
 				}

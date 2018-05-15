@@ -1,0 +1,17 @@
+version: "3.5"
+services:
+  whatsmyip:
+    image: fananchong/whatsmyip
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+      replicas: 1
+      restart_policy:
+        condition: any
+    networks:
+      hostnet: {}
+
+networks:
+  hostnet:
+    external: true
+    name: host

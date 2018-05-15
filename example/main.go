@@ -20,20 +20,20 @@ func NewMyNode() *MyNode {
 	return this
 }
 
-func (this *MyNode) OnNodeUpdate(myIP string, nodeType int, id string, data []byte) {
-	fmt.Println("OnNodeUpdate: myIP =", myIP, "nodeType =", nodeType, "id =", id, "data =", data)
+func (this *MyNode) OnNodeUpdate(nodeIP string, nodeType int, id string, data []byte) {
+	fmt.Println("OnNodeUpdate: nodeIP =", nodeIP, "nodeType =", nodeType, "id =", id, "data =", data)
 }
 
-func (this *MyNode) OnNodeJoin(myIP string, nodeType int, id string, data []byte) {
-	fmt.Println("OnNodeJoin: myIP =", myIP, "nodeType =", nodeType, "id =", id, "data =", data)
+func (this *MyNode) OnNodeJoin(nodeIP string, nodeType int, id string, data []byte) {
+	fmt.Println("OnNodeJoin: nodeIP =", nodeIP, "nodeType =", nodeType, "id =", id, "data =", data)
 }
 
-func (this *MyNode) OnNodeLeave(myIP string, nodeType int, id string) {
-	fmt.Println("OnNodeLeave: myIP =", myIP, "nodeType =", nodeType, "id =", id)
+func (this *MyNode) OnNodeLeave(nodeType int, id string) {
+	fmt.Println("OnNodeLeave: nodeType =", nodeType, "id =", id)
 }
 
 func (this *MyNode) GetPutData() (string, error) {
-	return "", nil
+	return string([]byte{1, 2, 3, 4}), nil
 }
 
 func main() {
