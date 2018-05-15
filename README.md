@@ -1,6 +1,11 @@
 # go-discovery
 discovery service for golang
 
+### 功能
+
+  - 封装etcd，提供事件触发接口
+  - 结点自识别自身对外IP
+
 
 ### 例子
 
