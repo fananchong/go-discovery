@@ -21,11 +21,11 @@ func NewMyNode() *MyNode {
 func (this *MyNode) OnNodeJoin(nodeIP string, nodeType int, id string, data []byte) {
 	this.Node.OnNodeJoin(nodeIP, nodeType, id, data)
 
-	fmt.Println("print current all node #1:")
+	fmt.Println("print current all node:")
 	for t := 1; t <= 4; t++ {
 		if lst, ok := this.Servers.GetAll(t); ok {
 			for _, info := range lst {
-				fmt.Printf("    type:%d addr:%s #%d\n", info.GetType(), info.GetExternalIp(), t)
+				fmt.Printf("    type:%d addr:%s\n", info.GetType(), info.GetExternalIp())
 			}
 		}
 	}
@@ -34,11 +34,11 @@ func (this *MyNode) OnNodeJoin(nodeIP string, nodeType int, id string, data []by
 func (this *MyNode) OnNodeLeave(nodeType int, id string) {
 	this.Node.OnNodeLeave(nodeType, id)
 
-	fmt.Println("print current all node #2:")
+	fmt.Println("print current all node:")
 	for t := 1; t <= 4; t++ {
 		if lst, ok := this.Servers.GetAll(t); ok {
 			for _, info := range lst {
-				fmt.Printf("    type:%d addr:%s #%d\n", info.GetType(), info.GetExternalIp(), t)
+				fmt.Printf("    type:%d addr:%s\n", info.GetType(), info.GetExternalIp())
 			}
 		}
 	}
