@@ -7,11 +7,11 @@ if not exist %TEMP_DIR%\src (
 set CURDIR=%~dp0
 set BASEDIR=%~dp0
 set BASEDIR=%BASEDIR:\src\github.com\fananchong\go-discovery\Godeps\=\%
-set GOPATH=%BASEDIR%;D:\tmp
+set GOPATH=%BASEDIR%;D:\temp
 copy /y Godeps.json.template Godeps.json
 cd %CURDIR%\..
 if exist vendor ( rd /q /s vendor )
-.\tool\godep\godep.exe update
-.\tool\godep\godep.exe save ./...
+godep.exe update
+godep.exe save ./...
 cd %CURDIR%
 pause
