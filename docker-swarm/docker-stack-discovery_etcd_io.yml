@@ -2,7 +2,7 @@ version: "3"
 services:
 
   discovery_etcd_io:
-    image: quay.io/coreos/discovery.etcd.io
+    image: quay.io/coreos/discovery.etcd.io:latest
     deploy:
       placement:
         constraints: [node.role == manager]
@@ -18,7 +18,7 @@ services:
       - net
       
   db:
-    image: quay.io/coreos/etcd
+    image: quay.io/coreos/etcd:latest
     deploy:
       placement:
         constraints: [node.role == manager]

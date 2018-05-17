@@ -53,14 +53,14 @@ func (this *Put) put(nodeType int, putInterval int64) {
 			if cli == nil {
 				return
 			}
-			resp, err := cli.Grant(context.TODO(), putInterval+5)
+			resp, err := cli.Grant(this.ctx, putInterval+5)
 			if err != nil {
 				xlog.Errorln(err)
 			} else {
 				var data string
 				data, err = this.Derived.GetPutData()
 				if err == nil {
-					_, err = cli.Put(context.TODO(), this.Derived.Id(), this.nodeIP+"#"+data, clientv3.WithLease(resp.ID))
+					_, err = cli.Put(this.ctx, this.Derived.Id(), this.nodeIP+"#"+data, clientv3.WithLease(resp.ID))
 					if err != nil {
 						xlog.Errorln(err)
 					}

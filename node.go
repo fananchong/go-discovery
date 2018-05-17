@@ -2,6 +2,7 @@ package godiscovery
 
 import (
 	"context"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -26,6 +27,7 @@ type INode interface {
 type Node struct {
 	Watch
 	Put
+	Port
 	client         *clientv3.Client
 	hosts          []string
 	whatsmyipHost  string
@@ -62,6 +64,16 @@ func (this *Node) Open(hosts []string, whatsmyipHost string, nodeType int, watch
 		go this.reopen()
 		return
 	}
+
+	if err := this.Port.Init(this.ctx, this.client); err != nil {
+		xlog.Errorln(err)
+		if cli != nil {
+			cli.Close()
+		}
+		go this.reopen()
+		return
+	}
+
 	if nodeType != 0 {
 		if whatsmyipHost != "" {
 			resp, err := http.Get("http://" + whatsmyipHost)
@@ -83,7 +95,7 @@ func (this *Node) Open(hosts []string, whatsmyipHost string, nodeType int, watch
 				go this.reopen()
 				return
 			}
-			this.Put.nodeIP = string(body)
+			this.Put.nodeIP = fmt.Sprintf("%s:%d", string(body), this.GetPort())
 		}
 		if err := this.Put.Open(this.ctx, nodeType, putInterval); err != nil {
 			xlog.Errorln(err)

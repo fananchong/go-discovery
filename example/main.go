@@ -21,11 +21,11 @@ func NewMyNode() *MyNode {
 }
 
 func (this *MyNode) OnNodeUpdate(nodeIP string, nodeType int, id string, data []byte) {
-	fmt.Println("OnNodeUpdate: nodeIP =", nodeIP, "nodeType =", nodeType, "id =", id, "data =", data)
+	fmt.Println("OnNodeUpdate: nodeIP =", nodeIP, "nodeType =", nodeType, "id =", id, "data =", string(data))
 }
 
 func (this *MyNode) OnNodeJoin(nodeIP string, nodeType int, id string, data []byte) {
-	fmt.Println("OnNodeJoin: nodeIP =", nodeIP, "nodeType =", nodeType, "id =", id, "data =", data)
+	fmt.Println("OnNodeJoin: nodeIP =", nodeIP, "nodeType =", nodeType, "id =", id, "data =", string(data))
 }
 
 func (this *MyNode) OnNodeLeave(nodeType int, id string) {
@@ -33,7 +33,7 @@ func (this *MyNode) OnNodeLeave(nodeType int, id string) {
 }
 
 func (this *MyNode) GetPutData() (string, error) {
-	return string([]byte{1, 2, 3, 4}), nil
+	return string("here can put overload data!"), nil
 }
 
 func main() {
@@ -56,12 +56,12 @@ func main() {
 
 	go http.ListenAndServe(fmt.Sprintf(":%d", pprof_port), nil)
 
-	for {
-		node := NewMyNode()
-		node.OpenByStr(hosts, whatsmyip, nodeType, watchNodeTypes, putInterval)
+	node := NewMyNode()
+	node.OpenByStr(hosts, whatsmyip, nodeType, watchNodeTypes, putInterval)
 
+	for {
 		time.Sleep(10 * time.Second)
-		fmt.Println("node close .....................")
-		node.Close()
 	}
+
+	node.Close()
 }
