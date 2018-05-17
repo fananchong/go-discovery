@@ -154,6 +154,12 @@ func (this *Node) Id() string {
 	return this.Put.nodeId
 }
 
+func (this *Node) Ip() string {
+	this.mutex.RLock()
+	defer this.mutex.RUnlock()
+	return this.Put.nodeIP
+}
+
 func (this *Node) SetId(id string) {
 	this.mutex.Lock()
 	defer this.mutex.Unlock()
