@@ -22,7 +22,7 @@ func (this *Port) GetPort() uint16 {
 }
 
 func (this *Port) Init(root context.Context, client *clientv3.Client) error {
-	key := "__#etcdport#__"
+	key := "__#ETCDPORT#__"
 	this.ctx, this.ctxCancel = context.WithCancel(root)
 	rep, err := client.Get(this.ctx, key)
 	if err != nil {
@@ -50,7 +50,11 @@ func (this *Port) Init(root context.Context, client *clientv3.Client) error {
 		if err != nil {
 			return err
 		}
-		version = txnRep.Responses[0].GetResponseRange().Kvs[0].Version
+		if txnRep.Succeeded {
+			version = 1
+		} else {
+			version = txnRep.Responses[0].GetResponseRange().Kvs[0].Version
+		}
 	}
 
 	for {

@@ -7,7 +7,7 @@ import (
 )
 
 func (this *Node) NewNodeId() (uint32, error) {
-	key := "__#etcdid1#__"
+	key := "__#ETCDID#__"
 	rep, err := this.GetClient().Get(this.GetCtx(), key)
 	if err != nil {
 		return 0, err
@@ -32,7 +32,11 @@ func (this *Node) NewNodeId() (uint32, error) {
 		if err != nil {
 			return 0, err
 		}
-		version = txnRep.Responses[0].GetResponseRange().Kvs[0].Version
+		if txnRep.Succeeded {
+			version = 1
+		} else {
+			version = txnRep.Responses[0].GetResponseRange().Kvs[0].Version
+		}
 	}
 
 	var data string
