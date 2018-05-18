@@ -20,15 +20,15 @@ func NewMyNode() *MyNode {
 	return this
 }
 
-func (this *MyNode) OnNodeUpdate(nodeIP string, nodeType int, id string, data []byte) {
+func (this *MyNode) OnNodeUpdate(nodeIP string, nodeType int, id uint32, data []byte) {
 	fmt.Println("OnNodeUpdate: nodeIP =", nodeIP, "nodeType =", nodeType, "id =", id, "data =", string(data))
 }
 
-func (this *MyNode) OnNodeJoin(nodeIP string, nodeType int, id string, data []byte) {
+func (this *MyNode) OnNodeJoin(nodeIP string, nodeType int, id uint32, data []byte) {
 	fmt.Println("OnNodeJoin: nodeIP =", nodeIP, "nodeType =", nodeType, "id =", id, "data =", string(data))
 }
 
-func (this *MyNode) OnNodeLeave(nodeType int, id string) {
+func (this *MyNode) OnNodeLeave(nodeType int, id uint32) {
 	fmt.Println("OnNodeLeave: nodeType =", nodeType, "id =", id)
 }
 

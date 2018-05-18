@@ -18,27 +18,27 @@ func NewMyNode() *MyNode {
 	return this
 }
 
-func (this *MyNode) OnNodeJoin(nodeIP string, nodeType int, id string, data []byte) {
+func (this *MyNode) OnNodeJoin(nodeIP string, nodeType int, id uint32, data []byte) {
 	this.Node.OnNodeJoin(nodeIP, nodeType, id, data)
 
 	fmt.Println("print current all node:")
 	for t := 1; t <= 4; t++ {
 		if lst, ok := this.Servers.GetAll(t); ok {
 			for _, info := range lst {
-				fmt.Printf("    type:%d addr:%s\n", info.GetType(), info.GetExternalIp())
+				fmt.Printf("    id:%d type:%d addr:%s\n", info.GetId(), info.GetType(), info.GetExternalIp())
 			}
 		}
 	}
 }
 
-func (this *MyNode) OnNodeLeave(nodeType int, id string) {
+func (this *MyNode) OnNodeLeave(nodeType int, id uint32) {
 	this.Node.OnNodeLeave(nodeType, id)
 
 	fmt.Println("print current all node:")
 	for t := 1; t <= 4; t++ {
 		if lst, ok := this.Servers.GetAll(t); ok {
 			for _, info := range lst {
-				fmt.Printf("    type:%d addr:%s\n", info.GetType(), info.GetExternalIp())
+				fmt.Printf("    id:%d type:%d addr:%s\n", info.GetId(), info.GetType(), info.GetExternalIp())
 			}
 		}
 	}
