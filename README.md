@@ -6,6 +6,7 @@ discovery service for golang
   - 封装etcd，提供事件触发接口
   - 节点自识别自身对外IP
   - 节点自动分配可用端口、多节点不会冲突
+  - 自动分配节点ID、多节点ID不会冲突
   - 提供服务列表
 
 
