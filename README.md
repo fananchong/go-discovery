@@ -158,6 +158,19 @@ func main() {
 **OnNodeUpdate、OnNodeJoin、OnNodeLeave、GetPutData 在内部协程被调用，请注意多协程安全！！！**
 
 
+### 其他注意事项
+
+经测试，etcd不能频繁put数据，可以通过优化操作：
+
+1. 进程开启时，put一次数据
+2. 超过负载或恢复正常时，put一次数据
+3. 60s，定期，put数据 (看服务节点数据，来调整)
+
+客户端做轮询方式负载均衡
+
+这样可以极大的减轻etcd的负载
+
+
 ### Etcd部署脚本说明
 
 提供2种Docker Swarm方式部署etcd
