@@ -23,14 +23,20 @@ func NewMyNode() *MyNode {
 func (this *MyNode) OnNodeJoin(nodeIP string, nodeType int, id uint32, data []byte) {
 	this.Node.OnNodeJoin(nodeIP, nodeType, id, data)
 
-	fmt.Println("current node count:", this.Servers.Count(nodeType))
+	if showmsg != 0 {
+		fmt.Println("[join] current node count:", this.Servers.Count(nodeType))
+	}
 }
 
 func (this *MyNode) OnNodeLeave(nodeType int, id uint32) {
 	this.Node.OnNodeLeave(nodeType, id)
 
-	fmt.Println("current node count:", this.Servers.Count(nodeType))
+	if showmsg != 0 {
+		fmt.Println("[leave] current node count:", this.Servers.Count(nodeType))
+	}
 }
+
+var showmsg = 0
 
 func main() {
 
@@ -46,6 +52,7 @@ func main() {
 	flag.Int64Var(&putInterval, "putInterval", 1, "put interval")
 	clientCount := 0
 	flag.IntVar(&clientCount, "clientCount", 3, "client count")
+	flag.IntVar(&showmsg, "showmsg", 0, "showmsg")
 	flag.Parse()
 
 	for i := 0; i < clientCount; i++ {
