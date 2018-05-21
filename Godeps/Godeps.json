@@ -38,7 +38,7 @@
 		},
 		{
 			"ImportPath": "github.com/fananchong/gomap",
-			"Rev": "64a48ce2749825d5cb5816f71424aa075c600d09"
+			"Rev": "828333b1f5bca672321e51a44cfaf5e1906040d3"
 		},
 		{
 			"ImportPath": "github.com/gogo/protobuf/gogoproto",
