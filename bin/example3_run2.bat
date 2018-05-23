@@ -1,1 +1,1 @@
-example3.exe --hosts=101.132.47.70:12379,101.132.47.70:22379,101.132.47.70:32379 --whatsmyip=101.132.47.70:3000 --nodeType=2 --watchNodeTypes=1,2 --putInterval=1 --clientCount=1 --showmsg=1
+example3.exe --hosts=192.168.93.183:12379,192.168.93.183:22379,192.168.93.183:32379 --whatsmyip=192.168.93.183:3000 --nodeType=2 --watchNodeTypes=1,2 --putInterval=5 --clientCount=1 --showmsg=1 --appid=10
