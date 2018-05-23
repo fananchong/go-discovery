@@ -1,6 +1,15 @@
 # go-discovery
 discovery service for golang
 
+
+**注意：目前对etcd watch方式做下测试，效果不是很理想。本库慎用与生产环境！！！**
+
+![图1](assets/1.jpg)
+
+
+**后续会对 go-discovery 实现机制做回炉改造！！！**
+
+
 ### 功能
 
   - 封装etcd，提供事件触发接口
